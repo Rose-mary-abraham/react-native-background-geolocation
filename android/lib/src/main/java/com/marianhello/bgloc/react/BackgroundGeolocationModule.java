@@ -203,16 +203,20 @@ public class BackgroundGeolocationModule extends ReactContextBaseJavaModule impl
     }
 
     @ReactMethod
-    public void getValidLocations(final Callback success, Callback error) {
+    public void getValidLocations(final Callback success, final Callback error) {
         runOnBackgroundThread(new Runnable() {
             public void run() {
-                WritableArray locationsArray = Arguments.createArray();
-                Collection<BackgroundLocation> locations = facade.getValidLocations();
-                for (BackgroundLocation location : locations) {
-                    locationsArray.pushMap(LocationMapper.toWriteableMapWithId(location));
+                try {
+                    WritableArray locationsArray = Arguments.createArray();
+                    Collection<BackgroundLocation> locations = facade.getValidLocations();
+                    for (BackgroundLocation location : locations) {
+                        locationsArray.pushMap(LocationMapper.toWriteableMapWithId(location));
+                    }
+                    success.invoke(locationsArray);
+                } catch (Exception e) {
+                    error.invoke(ErrorMap.from(e));
                 }
-                success.invoke(locationsArray);
-            }
+            }  
         });
     }
 
@@ -227,11 +231,15 @@ public class BackgroundGeolocationModule extends ReactContextBaseJavaModule impl
     }
 
     @ReactMethod
-    public void deleteAllLocations(final Callback success, Callback error) {
+    public void deleteAllLocations(final Callback success, final Callback error) {
         runOnBackgroundThread(new Runnable() {
             public void run() {
-                facade.deleteAllLocations();
-                success.invoke(true);
+                try {
+                    facade.deleteAllLocations();
+                    success.invoke(true);
+                } catch (Exception e) {
+                    error.invoke(ErrorMap.from(e));
+                }
             }
         });
     }
