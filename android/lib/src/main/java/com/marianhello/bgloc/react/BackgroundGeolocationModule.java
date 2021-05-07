@@ -221,11 +221,15 @@ public class BackgroundGeolocationModule extends ReactContextBaseJavaModule impl
     }
 
     @ReactMethod
-    public void deleteLocation(final Integer locationId, final Callback success, Callback error) {
+    public void deleteLocation(final Integer locationId, final Callback success, final Callback error) {
         runOnBackgroundThread(new Runnable() {
             public void run() {
-                facade.deleteLocation(locationId.longValue());
-                success.invoke(true);
+                try {
+                    facade.deleteLocation(locationId.longValue());
+                    success.invoke(true);
+                } catch (Exception e) {
+                    error.invoke(ErrorMap.from(e));
+                }
             }
         });
     }
